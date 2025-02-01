@@ -1,10 +1,10 @@
-mahed 3
-ali 7
-mamad 5
-mahdi 9
-fati 56
-alimorad 91
-mahan 34
-jj 12
-yoru 78
-kakeru 23
+mahed 0 0
+ali 0 0
+mamad 439298064 219649032
+mahdi 65528 32764
+fati 0 0
+alimorad 0 0
+mahan 54911960 -2120027668
+jj 8190 4095
+yoru 114896 57448
+kakeru 0 0

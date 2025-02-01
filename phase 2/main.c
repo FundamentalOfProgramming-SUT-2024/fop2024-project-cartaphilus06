@@ -217,6 +217,7 @@ int check_partial_existion(Room room,int x,int y);
 void check_inDoor(int x,int y);
 void check_indoor_curse(int x,int y);
 void exit_indoor(int x,int y);
+void indoorEffectOnHp(time_t* start);
 void display_indoor_curse(int x,int y);
 int is_wall(int x,int y);
 int end_game(int x,int y);
@@ -1425,6 +1426,7 @@ void game_menu(){
                 mvprintw(10,0,"there are traps in each room so watch where you step");
                 mvprintw(11,(maxCol-strlen("Press any key to return to game menu"))/2,"Press any key to return to game menu");
                 getch();
+                clear();
             }
         }
         else {
@@ -1797,7 +1799,7 @@ void move_player(int target_x,int target_y){
         if(indoor_check) check_indoor_curse(target_x,target_y);
         else check_curse(target_x,target_y);
         check_inDoor(target_x,target_y);
-        if(indoor_check) indoorEffectOnHp(&indoorEffectOnHp);
+        if(indoor_check) indoorEffectOnHp(&indoor_timer);
         exit_indoor(target_x,target_y);
         if(is_room(target_x,target_y)) reveal_room(target_x,target_y);
         if(whole_map->dungeon[target_y][target_x]=='<') next_floor();
@@ -2330,8 +2332,8 @@ void save(){
 }
 
 int esc_menu(){
-    char* buttons[]={"save","back to game","scoreboard","quit"};
-    int num_buttons=4;
+    char* buttons[]={"save","back to game","leader board","resources","quit"};
+    int num_buttons=5;
     int current_selection=0;
     while(true){
         clear();
@@ -2358,7 +2360,7 @@ int esc_menu(){
             if(current_selection==2){
                 calculate_leaderboard();
             }
-            if(current_selection==3){
+            if(current_selection==4){
                 endwin();
                 return 1;
             }
