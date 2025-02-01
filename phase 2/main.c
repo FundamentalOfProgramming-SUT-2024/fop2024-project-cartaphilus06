@@ -2332,7 +2332,7 @@ void save(){
 }
 
 int esc_menu(){
-    char* buttons[]={"save","back to game","leader board","resources","quit"};
+    char* buttons[]={"save","back to game","leader board","quit"};
     int num_buttons=5;
     int current_selection=0;
     while(true){
@@ -2360,7 +2360,7 @@ int esc_menu(){
             if(current_selection==2){
                 calculate_leaderboard();
             }
-            if(current_selection==4){
+            if(current_selection==3){
                 endwin();
                 return 1;
             }
