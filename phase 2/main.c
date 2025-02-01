@@ -1229,8 +1229,10 @@ int game_over(){
         attroff(COLOR_PAIR('r'));
         whole_map->player->hp=16;
         whole_map->player->key=0;
+        whole_map->player->broken_key=0;
         whole_map->player->food=0;
         whole_map->player->hunger=4;
+        whole_map->player->current_weapon=0;
         whole_map->player->sword_count=0;
         whole_map->player->dagger_count=0;
         whole_map->player->arrow_count=0;
@@ -3082,7 +3084,7 @@ void weapon_menu(){
         mvprintw(2,3*((maxCol-strlen("long range weapons"))/4),"long range weapons");
         for(int i=0;i<num_buttons1;i++){
             if(i==current_selection) attron(A_REVERSE);
-            mvprintw(4+i,(maxCol-strlen("close range weapons"))/4,"%s %d",buttons1[i],(1));
+            mvprintw(4+i,(maxCol-strlen("close range weapons"))/4,"%s %d",buttons1[i],(i==0?1:(whole_map->player->sword_count?1:0)));
             if(i==current_selection) attroff(A_REVERSE);
         }
         for(int i=0;i<num_buttons2;i++){
@@ -3330,9 +3332,10 @@ void curses_list(){
 Monster create_monster(Room* room,char kind){
     Monster* new_monster=(Monster*)malloc(sizeof(Monster));
     while(true){
+        Room* rooms=current_floor==1?rooms_f1:current_floor==2?rooms_f2:current_floor==3?rooms_f3:rooms_f4;
         int x=rand()%(room->width)+room->x;
         int y=rand()%(room->height)+room->y;
-        if(check_partial_existion(*room,x,y)){
+        if(check_partial_existion(*room,x,y) && check_nearby_doors(rooms,x,y)){
             new_monster->x=x;
             new_monster->y=y;
             break;
@@ -3403,9 +3406,12 @@ void generate_monsters(Room* room){
     room[1].monster[0]=create_monster(&room[1],'D');
     room[2].monster[0]=create_monster(&room[2],'f');
     room[2].monster[1]=create_monster(&room[2],'D');
+    room[3].monster[1]=create_monster(&room[3],'f');
     room[3].monster[0]=create_monster(&room[3],'g');
     room[4].monster[0]=create_monster(&room[4],'S');
+    room[4].monster[1]=create_monster(&room[4],'g');
     room[5].monster[0]=create_monster(&room[5],'U');
+    room[5].monster[1]=create_monster(&room[5],'g');
 }
 
 void swordAttack(int x,int y){
@@ -3571,7 +3577,7 @@ void magicWandAttack(int x,int y, char direction){
             clear();
             mvprintw(0,0,"magic wand hit a barrier");
             whole_map->dungeon[current_y][current_x]='$';
-            rooms[index].dagger.used=1;
+            rooms[index].magic_wand.used=1;
             printTheMap();
             break;
         }
@@ -3655,7 +3661,6 @@ void quick_monster_check(int x,int y){
     for(int i=0;i<10;i++){
         for(int j=0;j<4;j++){
             if(x+dx[j]==rooms[index].monster[i].x && y+dy[j]==rooms[index].monster[i].y){
-                //if(rooms[index].monster[i].movability) rooms[index].monster[i].on_move=1;
                 rooms[index].monster[i].readyAttack=1;
             }
         }
@@ -3776,7 +3781,7 @@ void monster_attack(){
                 printTheMap();
             }
             if(monster->kind=='U'){
-                whole_map->player->hp-=2;
+                whole_map->player->hp-=1;
                 monster->readyAttack=0;
                 clear();
                 mvprintw(0,0,"The undead scored a big hit on you!");

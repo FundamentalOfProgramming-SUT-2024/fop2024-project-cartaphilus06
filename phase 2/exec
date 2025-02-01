@@ -1,0 +1,13 @@
+# Makefile
+CC = gcc
+CFLAGS = -lncurses -lSDL2 -lSDL2_mixer
+TARGET = main
+
+all: $(TARGET)
+
+$(TARGET): $(TARGET).c
+    $(CC) -o $(TARGET) $(TARGET).c $(CFLAGS)
+
+clean:
+    rm -f $(TARGET)
+
