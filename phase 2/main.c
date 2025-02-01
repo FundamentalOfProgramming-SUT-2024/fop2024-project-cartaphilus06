@@ -232,6 +232,7 @@ void move_monster(int lastPlayerX,int lastPlayerY);
 void quick_monster_check(int lastX,int lastY);
 void monster_attack();
 int game_over();
+void monsterMoveOn();
 
 int main(){
     whole_map=(The_whole_map*)malloc(sizeof(The_whole_map));
@@ -1806,6 +1807,7 @@ void move_player(int target_x,int target_y){
         reveal_corridor(target_x,target_y,0);
         move_monster(lastPlayerX,lastPlayerY);
         quick_monster_check(target_x,target_y);
+        monsterMoveOn();
         monster_attack();
     }
 }
@@ -3653,7 +3655,7 @@ void quick_monster_check(int x,int y){
     for(int i=0;i<10;i++){
         for(int j=0;j<4;j++){
             if(x+dx[j]==rooms[index].monster[i].x && y+dy[j]==rooms[index].monster[i].y){
-                if(rooms[index].monster[i].movability) rooms[index].monster[i].on_move=1;
+                //if(rooms[index].monster[i].movability) rooms[index].monster[i].on_move=1;
                 rooms[index].monster[i].readyAttack=1;
             }
         }
@@ -3671,27 +3673,67 @@ int checkPossibleObstaclesForMonsters(int x,int y,Room room){
 }
 
 void move_monster(int lastPlayerX,int lastPlayerY){
-    if(whole_map->dungeon[lastPlayerY][lastPlayerX]=='#'){
+    if(whole_map->dungeon[lastPlayerY][lastPlayerX]=='#' || whole_map->dungeon[whole_map->player->y][whole_map->player->x]=='+'){
         return;
     }
     int index=return_room_index(whole_map->player->x,whole_map->player->y);
     Room* rooms=current_floor==1?rooms_f1:current_floor==2?rooms_f2:current_floor==3?rooms_f3:rooms_f4;
+    int x=whole_map->player->x;
+    int y=whole_map->player->y;
     for(int i=0;i<10;i++){
         Monster* monster=&rooms[index].monster[i];
+        int dx=x-monster->x;
+        int dy=y-monster->y;
+        int xDir=dx>0?1:dx==0?0:-1;
+        int yDir=dy>0?1:dy==0?0:-1;
         if(monster->movability && monster->on_move){
-            if(monster->moves_made==5 && monster->kind!='S'){
-                monster->on_move=false;
+            if(monster->kind!='S' && monster->moves_made==5){
                 monster->moves_made=0;
-                monster->readyAttack=0;
-                continue;
+                monster->on_move=false;
             }
-            if(checkPossibleObstaclesForMonsters(lastPlayerX,lastPlayerY,rooms[index])){
+            if((dx==xDir && !dy) || (dy==yDir && !dx) || (dx==xDir && dy==yDir)) continue;
+            if(checkPossibleObstaclesForMonsters(monster->x+xDir,monster->y+yDir,rooms[index])){
                 whole_map->dungeon[monster->y][monster->x]='.';
-                monster->x=lastPlayerX;
-                monster->y=lastPlayerY;
+                monster->x+=xDir;
+                monster->y+=yDir;
                 monster->moves_made++;
                 whole_map->dungeon[monster->y][monster->x]=monster->kind;
             }
+            else if(checkPossibleObstaclesForMonsters(monster->x+xDir,monster->y,rooms[index])){
+                whole_map->dungeon[monster->y][monster->x]='.';
+                monster->x+=xDir;
+                monster->moves_made++;
+                whole_map->dungeon[monster->y][monster->x]=monster->kind;
+            }
+            else if(checkPossibleObstaclesForMonsters(monster->x,monster->y+yDir,rooms[index])){
+                whole_map->dungeon[monster->y][monster->x]='.';
+                monster->y+=yDir;
+                monster->moves_made++;
+                whole_map->dungeon[monster->y][monster->x]=monster->kind;
+            }
+        }
+    }
+}
+
+void monsterMoveOn(){
+    int x=whole_map->player->x;
+    int y=whole_map->player->y;
+    if(whole_map->dungeon[y][x]=='#') return;
+    int index=return_room_index(x,y);
+    if(!index) return;
+    Room* rooms=current_floor==1?rooms_f1:current_floor==2?rooms_f2:current_floor==3?rooms_f3:rooms_f4;
+    int dx[]={1,0,-1,0};
+    int dy[]={0,1,0,-1};
+    for(int i=0;i<4;i++){
+        if((x!=rooms[index].doors[0].x+dx[i] || y!=rooms[index].doors[0].y+dy[i]) && (x!=rooms[index].doors[1].x+dx[i] || y!=rooms[index].doors[1].y+dy[i])){
+            if(i==3) return;
+        }
+        else break;
+    }
+    for(int i=0;i<10;i++){
+        Monster* monster=&rooms[index].monster[i];
+        if(monster->movability){
+            monster->on_move=true;
         }
     }
 }
