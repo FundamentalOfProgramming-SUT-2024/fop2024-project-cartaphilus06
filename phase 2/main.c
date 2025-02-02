@@ -19,6 +19,7 @@ typedef struct Player{
     int hp;
     char color;
     int gold;
+    int score;
     int key;
     int broken_key;
     int food;
@@ -233,6 +234,7 @@ void quick_monster_check(int lastX,int lastY);
 void monster_attack();
 int game_over();
 void monsterMoveOn();
+void end_game_test();
 
 int main(){
     whole_map=(The_whole_map*)malloc(sizeof(The_whole_map));
@@ -1179,13 +1181,57 @@ int end_game(int x,int y){
     if(current_floor==4 && whole_map->dungeon[y][x]=='<'){
         clear();
         save();
-        init_pair('y',COLOR_YELLOW,COLOR_BLACK);
-        attron(COLOR_PAIR('y'));
-        int order=(maxCol-strlen("Congrats! You won the game! Press any key to return"))/2;
-        mvprintw(maxRow/2,order,"Congrats! Your won the game!");
-        mvprintw(maxRow/2+1,order,"You score is %d",whole_map->player->gold);
-        attroff(COLOR_PAIR('y'));
-        getch();
+        setlocale(LC_ALL,"");
+        const char* youWin[] = {
+            " __     ______  _    _  __          _______ _   _ _  ",
+            " \\ \\   / / __ \\| |  | | \\ \\        / /_   _| \\ | | | ",
+            "  \\ \\_/ / |  | | |  | |  \\ \\  /\\  / /  | | |  \\| | | ",
+            "   \\   /| |  | | |  | |   \\ \\/  \\/ /   | | | . ` | | ",
+            "    | | | |__| | |__| |    \\  /\\  /   _| |_| |\\  |_| ",
+            "    |_|  \\____/ \\____/      \\/  \\/   |_____|_| \\_(_) ",
+            "                                                     ",
+            "",
+            NULL
+        };
+        const char* Congrats[]={
+            "                         ______________                         ",
+            "                        '._==_==_=_.'                           ",
+            "                        .-\\:      /-.                           ",
+            "                       | (|:.     |) |                          ",
+            "                        '-|:.     |-'                           ",
+            "                          \\::.    /                             ",
+            "                           '::. .'                              ",
+            "                             ) (                                ",
+            "                           _.' '._                              ",
+            "                          `\"\"\"\"\"\"\"`                             ",
+            NULL
+        };
+        int num_lines=0;
+        while(youWin[num_lines]) num_lines++;
+        init_pair(220,220,COLOR_BLACK);
+        init_pair(40,40,COLOR_BLACK);
+        attron(COLOR_PAIR(40));
+        for(int i=0;i<num_lines;i++){
+            int x_order=(maxCol-strlen(youWin[i]))/2;
+            int y_order=(maxRow-num_lines)/2+i;
+            mvprintw(y_order,x_order,"%s",youWin[i]);
+        }
+        attroff(COLOR_PAIR(40));
+        int lines=num_lines;
+        num_lines=0;
+        while(Congrats[num_lines]) num_lines++;
+        attron(COLOR_PAIR(220));
+        for(int i=0;i<num_lines;i++){
+            int x_order=(maxCol-strlen(Congrats[i]))/2;
+            int y_order=(maxRow+lines)/2+i;
+            mvprintw(y_order,x_order,"%s",Congrats[i]);
+        }
+        attroff(COLOR_PAIR(220));
+        mvprintw(0,(maxCol-strlen("Press enter to return to game menu"))/2,"Press enter to return to game menu");
+        while(true){
+            char command=getch();
+            if(command=='\n') break;
+        }
         //manipulating the saved file
         char filename[MAX_CHAR];
         strcpy(filename,whole_map->user->username);
@@ -1197,6 +1243,8 @@ int end_game(int x,int y){
         whole_map->player->hp=16;
         whole_map->player->key=0;
         whole_map->player->food=0;
+        whole_map->player->gold=0;
+        whole_map->player->score=0;
         whole_map->player->hunger=4;
         whole_map->player->sword_count=0;
         whole_map->player->dagger_count=0;
@@ -1271,9 +1319,11 @@ int game_over(){
             mvprintw(y_order,x_order,"%s",gameOver[i]);
         }
         attroff(COLOR_PAIR('r'));
-        mvprintw(0,(maxCol-strlen("Press any key to return to game menu"))/2,"Press any key to return to game menu");
+        mvprintw(0,(maxCol-strlen("Press enter to return to game menu"))/2,"Press enter to return to game menu");
         whole_map->player->hp=16;
         whole_map->player->key=0;
+        whole_map->player->gold=0;
+        whole_map->player->score=0;
         whole_map->player->broken_key=0;
         whole_map->player->food=0;
         whole_map->player->hunger=4;
@@ -1293,7 +1343,10 @@ int game_over(){
                 whole_map->visibility[i][j]=0;
             }
         }
-        getch();
+        while(true){
+            char command=getch();
+            if(command=='\n') break;
+        }
         return 1;
     }
     return 0;
@@ -1321,6 +1374,7 @@ void allocate_everything(int maxRow,int maxCol){
     whole_map->user=(person_info*)malloc(sizeof(person_info));
     whole_map->player->color='d';
     whole_map->player->gold=0;
+    whole_map->player->score=0;
     whole_map->player->hp=16;
     whole_map->player->food=0;
     whole_map->player->key=0;
@@ -2141,6 +2195,7 @@ int load_game(){
     fscanf(file,"%d %d %d %d %d %d",&rooms_f1[5].x,&rooms_f1[5].y,&rooms_f1[5].width,&rooms_f1[5].height,&rooms_f1[5].doors[0].x,&rooms_f1[5].doors[0].y);
     fscanf(file,"%d %d",&rooms_f1[4].inDoor.x,&rooms_f1[4].inDoor.y);
     fscanf(file,"%d",&whole_map->player->gold);
+    fscanf(file,"%d %d %d",&whole_map->player->hp_curse,&whole_map->player->damage_curse,&whole_map->player->speed_curse);
     for(int i=0;i<6;i++){
         rooms[i].x=rooms_f1[i].x;
         rooms[i].y=rooms_f1[i].y;
@@ -2176,7 +2231,6 @@ int load_game(){
 
     whole_map->dungeon[rooms[5].doors[0].y][rooms[5].doors[0].x]='+';
     generate_random_corridors(rooms);
-
     for(int i=0;i<6;i++){
         for(int j=0;j<10;j++){
             int x,y,hp,movability,on_move,readyAttack,moves_made;
@@ -2314,7 +2368,7 @@ void save(){
     fprintf(file,"%d %d %d %d %d %d\n",rooms[5].x,rooms[5].y,rooms[5].width,rooms[5].height,rooms[5].doors[0].x,rooms[5].doors[0].y);
     fprintf(file,"%d %d\n",rooms[4].inDoor.x,rooms[4].inDoor.y);
     fprintf(file,"%d\n",whole_map->player->gold);
-    
+    fprintf(file,"%d %d %d\n",whole_map->player->hp_curse,whole_map->player->damage_curse,whole_map->player->speed_curse);
     for(int i=0;i<6;i++){
         for(int j=0;j<10;j++){
             fprintf(file,"%d %d %c %d %d %d %d %d\n",rooms[i].monster[j].x,rooms[i].monster[j].y,rooms[i].monster[j].kind,rooms[i].monster[j].hp,rooms[i].monster[j].movability,rooms[i].monster[j].on_move,rooms[i].monster[j].readyAttack,rooms[i].monster[j].moves_made);
@@ -2364,24 +2418,23 @@ void save(){
     fclose(file);
     //save the updated datas to leaderboard
     FILE* score_file=fopen("leaderboard.txt","r");
-    char users[100][50];
-    int scores[100];
+    userScores users[100];
     int index=0;
-    while(~fscanf(score_file,"%s",users[index])){
+    while(~fscanf(score_file,"%s",users[index].username)){
         int trash;
-        fscanf(file,"%d %d",&trash,&scores[index++]);
+        fscanf(file,"%d %d",&users[index].score,&users[index++].golds);
     }
     fclose(score_file);
     FILE* put_score=fopen("leaderboard.txt","w");
     for(int i=0;i<index;i++){
-        if(!strcmp(users[i],whole_map->user->username)) fprintf(file,"%s %d %d\n",users[i],2*whole_map->player->gold,whole_map->player->gold);
-        else fprintf(file,"%s %d %d\n",users[i],2*scores[i],scores[i]);
+        if(!strcmp(users[i].username,whole_map->user->username)) fprintf(file,"%s %d %d\n",users[i].username,whole_map->player->score,whole_map->player->gold);
+        else fprintf(file,"%s %d %d\n",users[i].username,users[i].score,users[i].golds);
     }
     fclose(put_score);
 }
 
 int esc_menu(){
-    char* buttons[]={"save","back to game","leader board","quit"};
+    char* buttons[]={"save","back to game","scoreboard","quit"};
     int num_buttons=4;
     int current_selection=0;
     while(true){
@@ -2448,6 +2501,7 @@ void check_item(int x,int y){
         rooms[index].gold.y=-1;
         int rand_gold=rand()%4+1;
         whole_map->player->gold+=rand_gold;
+        whole_map->player->score+=2*rand_gold;
         if(rand_gold==1) mvprintw(0,0,"You earned 1 gold!");
         else mvprintw(0,0,"Congrants! You earned %d golds!",rand_gold);
     }
@@ -3056,19 +3110,19 @@ void calculate_leaderboard(){
     for(int i=0;i<index;i++){
         if(i==0){
             attron(COLOR_PAIR('g'));
-            mvprintw(i,(maxCol-strlen(users[0].username)-20)/2,"%d.%s scores: %d golds: %d",i+1,users[i].username,users[i].score,users[i].golds);
+            mvprintw(i,(maxCol-strlen(users[0].username)-20)/2,"%d.%s scores: %d golds: %d (The goat)",i+1,users[i].username,users[i].score,users[i].golds);
             attroff(COLOR_PAIR('g'));
             continue;
         }
         if(i==1){
             attron(COLOR_PAIR('b'));
-            mvprintw(i,(maxCol-strlen(users[0].username)-20)/2,"%d.%s scores: %d golds: %d",i+1,users[i].username,users[i].score,users[i].golds);
+            mvprintw(i,(maxCol-strlen(users[0].username)-20)/2,"%d.%s scores: %d golds: %d (The conqueror)",i+1,users[i].username,users[i].score,users[i].golds);
             attroff(COLOR_PAIR('b'));
             continue;
         }
         if(i==2){
             attron(COLOR_PAIR('p'));
-            mvprintw(i,(maxCol-strlen(users[0].username)-20)/2,"%d.%s scores: %d golds: %d",i+1,users[i].username,users[i].score,users[i].golds);
+            mvprintw(i,(maxCol-strlen(users[0].username)-20)/2,"%d.%s scores: %d golds: %d (The protagonist)",i+1,users[i].username,users[i].score,users[i].golds);
             attroff(COLOR_PAIR('p'));
             continue;
         }
@@ -3339,6 +3393,7 @@ void curses_list(){
                 if(whole_map->player->hp_curse>0){
                     whole_map->player->hp_spell_on=true;
                     whole_map->player->hp_curse--;
+                    whole_map->player->hp+=2;
                 }
                 else{
                     mvprintw(0,0,"Sorry you don't have enough health spells");
@@ -3475,6 +3530,8 @@ void swordAttack(int x,int y){
         rooms[index].monster[i].movability=0;
         rooms[index].monster[i].on_move=false;
         rooms[index].monster[i].readyAttack=0;
+        Monster* monster=&rooms[index].monster[i];
+        whole_map->player->score+= monster->kind=='D'?1:monster->kind=='f'?2:monster->kind=='g'?3:monster->kind=='S'?4:5;
         char* options[]={"a demon","a snake","an undead","a fire breathing monster","a giant"};
         char kind=rooms[index].monster[i].kind;
         mvprintw(0,0,"You killed %s with a sword",kind=='S'?options[1]:kind=='D'?options[0]:kind=='f'?options[3]:kind=='g'?options[4]:options[2]);
@@ -3520,6 +3577,8 @@ void arrowAttack(int x,int y,char direction){
                 rooms[index].monster[ind].movability=0;
                 rooms[index].monster[ind].on_move=false;
                 rooms[index].monster[ind].readyAttack=0;
+                Monster* monster=&rooms[index].monster[i];
+                whole_map->player->score+= monster->kind=='D'?1:monster->kind=='f'?2:monster->kind=='g'?3:monster->kind=='S'?4:5;
                 clear();
                 char* options[]={"a demon","a snake","an undead","a fire breathing monster","a giant"};
                 char kind=rooms[index].monster[ind].kind;
@@ -3580,6 +3639,8 @@ void daggerAttack(int x,int y,char direction){
                 rooms[index].monster[ind].movability=0;
                 rooms[index].monster[ind].on_move=false;
                 rooms[index].monster[ind].readyAttack=0;
+                Monster* monster=&rooms[index].monster[i];
+                whole_map->player->score+= monster->kind=='D'?1:monster->kind=='f'?2:monster->kind=='g'?3:monster->kind=='S'?4:5;
                 clear();
                 char* options[]={"a demon","a snake","an undead","a fire breathing monster","a giant"};
                 char kind=rooms[index].monster[ind].kind;
@@ -3663,6 +3724,8 @@ void maceAttack(int x,int y){
         rooms[index].monster[i].movability=0;
         rooms[index].monster[i].on_move=false;
         rooms[index].monster[i].readyAttack=0;
+        Monster* monster=&rooms[index].monster[i];
+        whole_map->player->score+= monster->kind=='D'?1:monster->kind=='f'?2:monster->kind=='g'?3:monster->kind=='S'?4:5;
         char* options[]={"a demon","a snake","an undead","a fire breathing monster","a giant"};
         char kind=rooms[index].monster[i].kind;
         mvprintw(0,0,"You killed %s with mace",kind=='S'?options[1]:kind=='D'?options[0]:kind=='f'?options[3]:kind=='g'?options[4]:options[2]);
