@@ -2424,14 +2424,14 @@ void save(){
     userScores users[100];
     int index=0;
     while(~fscanf(score_file,"%s",users[index].username)){
-        int trash;
-        fscanf(file,"%d %d",&users[index].score,&users[index++].golds);
+        fscanf(score_file,"%d %d",&users[index].score,&users[index].golds);
+        index++;
     }
     fclose(score_file);
     FILE* put_score=fopen("leaderboard.txt","w");
     for(int i=0;i<index;i++){
-        if(!strcmp(users[i].username,whole_map->user->username)) fprintf(file,"%s %d %d\n",users[i].username,whole_map->player->score,whole_map->player->gold);
-        else fprintf(file,"%s %d %d\n",users[i].username,users[i].score,users[i].golds);
+        if(!strcmp(users[i].username,whole_map->user->username)) fprintf(put_score,"%s %d %d\n",users[i].username,whole_map->player->score,whole_map->player->gold);
+        else fprintf(put_score,"%s %d %d\n",users[i].username,users[i].score,users[i].golds);
     }
     fclose(put_score);
 }
