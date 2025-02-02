@@ -2731,16 +2731,18 @@ void generate_bukies(Room* rooms){
             break;
         }
     }
-    while(true){
-        int x=rand()%rooms[1].width + rooms[1].x;
-        int y=rand()%rooms[1].height + rooms[1].y;
-        if(check_anything_existion(rooms,x,y)){
-            rooms[1].magic_wand.x=x;
-            rooms[1].magic_wand.y=y;
-            rooms[1].magic_wand.existion=1;
-            rooms[1].magic_wand.used=0;
-            whole_map->dungeon[y][x]='$';
-            break;
+    if(current_floor==1 || current_floor==3){
+        while(true){
+            int x=rand()%rooms[1].width + rooms[1].x;
+            int y=rand()%rooms[1].height + rooms[1].y;
+            if(check_anything_existion(rooms,x,y)){
+                rooms[1].magic_wand.x=x;
+                rooms[1].magic_wand.y=y;
+                rooms[1].magic_wand.existion=1;
+                rooms[1].magic_wand.used=0;
+                whole_map->dungeon[y][x]='$';
+                break;
+            }
         }
     }
     while(true){
@@ -3524,6 +3526,28 @@ void generate_monsters(Room* room){
     room[4].monster[1]=create_monster(&room[4],'g');
     room[5].monster[0]=create_monster(&room[5],'U');
     room[5].monster[1]=create_monster(&room[5],'g');
+    if(current_floor>=2){
+        room[0].monster[0]=create_monster(&room[0],'D');
+        room[1].monster[1]=create_monster(&room[1],'f');
+        room[2].monster[2]=create_monster(&room[2],'S');
+        room[3].monster[2]=create_monster(&room[3],'D');
+        room[5].monster[2]=create_monster(&room[5],'D');
+    }
+    if(current_floor>=3){
+        room[0].monster[1]=create_monster(&room[0],'S');
+        room[1].monster[2]=create_monster(&room[1],'S');
+        room[3].monster[3]=create_monster(&room[3],'D');
+        room[4].monster[2]=create_monster(&room[4],'D');
+        room[5].monster[3]=create_monster(&room[5],'S');
+    }
+    if(current_floor>=4){
+        room[0].monster[2]=create_monster(&room[0],'g');
+        room[1].monster[3]=create_monster(&room[1],'g');
+        room[2].monster[4]=create_monster(&room[2],'g');
+        room[3].monster[4]=create_monster(&room[3],'g');
+        room[4].monster[3]=create_monster(&room[4],'S');
+        room[5].monster[4]=create_monster(&room[5],'U');
+    }
 }
 
 void swordAttack(int x,int y){
@@ -3753,9 +3777,18 @@ void attack_enemy(int x,int y,char direction){
         else if(whole_map->player->current_weapon==1) swordAttack(x+dx[i],y+dy[i]);
         else break;
     }
-    if(whole_map->player->current_weapon==2) daggerAttack(x,y,direction);
-    else if(whole_map->player->current_weapon==3) magicWandAttack(x,y,direction);
-    else if(whole_map->player->current_weapon==4) arrowAttack(x,y,direction);
+    if(whole_map->player->current_weapon==2) {
+        daggerAttack(x,y,direction);
+        move_monster(whole_map->player->x,whole_map->player->y);
+    }
+    else if(whole_map->player->current_weapon==3) {
+        magicWandAttack(x,y,direction);
+        move_monster(whole_map->player->x,whole_map->player->y);
+    }
+    else if(whole_map->player->current_weapon==4) {
+        arrowAttack(x,y,direction);
+        move_monster(whole_map->player->x,whole_map->player->y);
+    }
 }
 
 int check_monster_availability(int x,int y){
@@ -3850,6 +3883,7 @@ void monsterMoveOn(){
     int dx[]={1,0,-1,0};
     int dy[]={0,1,0,-1};
     for(int i=0;i<4;i++){
+        if(index==0) break;
         if((x!=rooms[index].doors[0].x+dx[i] || y!=rooms[index].doors[0].y+dy[i]) && (x!=rooms[index].doors[1].x+dx[i] || y!=rooms[index].doors[1].y+dy[i])){
             if(i==3) return;
         }

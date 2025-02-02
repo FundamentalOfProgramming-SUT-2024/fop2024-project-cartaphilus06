@@ -4,7 +4,7 @@ mahdi 20 12
 fati 23 11
 alimorad 40 19
 mahan 53 17
-mahed 123 41
+mahed 111 26
 jj 43 17
 yoru 32 16
 kakeru 32 3
