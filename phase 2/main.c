@@ -950,55 +950,59 @@ void generate_dungeon(Room* rooms){
             whole_map->dungeon[i][j]=' ';
         }
     }
-    rooms[0].bottom_col=0,rooms[0].up_col=maxCol/3;
-    rooms[0].bottom_row=1,rooms[0].up_row=maxRow/2;
-    rooms[0].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[0].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[0].x=rand()%(rooms[0].up_col-rooms[0].bottom_col-rooms[0].width-3)+rooms[0].bottom_col+2;
-    rooms[0].y=rand()%(rooms[0].up_row-rooms[0].bottom_row-rooms[0].height-3)+rooms[0].bottom_row+2;
-    create_room(rooms[0]);
+    while(true){
+        rooms[0].bottom_col=0,rooms[0].up_col=maxCol/3;
+        rooms[0].bottom_row=1,rooms[0].up_row=maxRow/2;
+        rooms[0].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[0].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[0].x=rand()%(rooms[0].up_col-rooms[0].bottom_col-rooms[0].width-3)+rooms[0].bottom_col+2;
+        rooms[0].y=rand()%(rooms[0].up_row-rooms[0].bottom_row-rooms[0].height-3)+rooms[0].bottom_row+2;
+
+        rooms[1].bottom_col=maxCol/3,rooms[1].up_col=2*(maxCol/3);
+        rooms[1].bottom_row=1,rooms[1].up_row=maxRow/2;
+        rooms[1].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[1].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[1].x=rand()%(rooms[1].up_col-rooms[1].bottom_col-rooms[1].width-3)+rooms[1].bottom_col+2;
+        rooms[1].y=rand()%(rooms[1].up_row-rooms[1].bottom_row-rooms[1].height-3)+rooms[1].bottom_row+2;
+        if(overlap(rooms[0],rooms[1])) continue;
+        rooms[2].bottom_col=(maxCol/3)*2,rooms[2].up_col=maxCol;
+        rooms[2].bottom_row=0,rooms[2].up_row=maxRow/2;
+        rooms[2].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[2].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[2].x=rand()%(rooms[2].up_col-rooms[2].bottom_col-rooms[2].width-3)+rooms[2].bottom_col+2;
+        rooms[2].y=rand()%(rooms[2].up_row-rooms[2].bottom_row-rooms[2].height-3)+rooms[2].bottom_row+2;
+        if(overlap(rooms[1],rooms[2])) continue;
+        rooms[3].bottom_col=2*(maxCol/3),rooms[3].up_col=maxCol;
+        rooms[3].bottom_row=maxRow/2,rooms[3].up_row=maxRow;
+        rooms[3].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[3].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[3].x=rand()%(rooms[3].up_col-rooms[3].bottom_col-rooms[3].width-3)+rooms[3].bottom_col+2;
+        rooms[3].y=rand()%(rooms[3].up_row-rooms[3].bottom_row-rooms[3].height-3)+rooms[3].bottom_row+2;
+        if(overlap(rooms[2],rooms[3])) continue;
+        rooms[4].bottom_col=maxCol/3,rooms[4].up_col=(maxCol/3)*2;
+        rooms[4].bottom_row=maxRow/2,rooms[4].up_row=maxRow;
+        rooms[4].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[4].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[4].x=rand()%(rooms[4].up_col-rooms[4].bottom_col-rooms[4].width-3)+rooms[4].bottom_col+2;
+        rooms[4].y=rand()%(rooms[4].up_row-rooms[4].bottom_row-rooms[4].height-3)+rooms[4].bottom_row+2;
+        if(overlap(rooms[3],rooms[4]) || overlap(rooms[4],rooms[1])) continue;
+        rooms[5].bottom_col=0,rooms[5].up_col=maxCol/3;
+        rooms[5].bottom_row=maxRow/2,rooms[5].up_row=maxRow;
+        rooms[5].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[5].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
+        rooms[5].x=rand()%(rooms[5].up_col-rooms[5].bottom_col-rooms[5].width-3)+rooms[5].bottom_col+2;
+        rooms[5].y=rand()%(rooms[5].up_row-rooms[5].bottom_row-rooms[5].height-3)+rooms[5].bottom_row+2;
+        if(overlap(rooms[5],rooms[4]) || overlap(rooms[5],rooms[0])) continue;
+        break;
+    }
     for(int i=rooms[0].y-1;i<=rooms[0].y+rooms[0].height;i++){
         for(int j=rooms[0].x-1;j<=rooms[0].x+rooms[0].width;j++) whole_map->visibility[i][j]=1;
     }
-
-    rooms[1].bottom_col=maxCol/3,rooms[1].up_col=2*(maxCol/3);
-    rooms[1].bottom_row=1,rooms[1].up_row=maxRow/2;
-    rooms[1].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[1].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[1].x=rand()%(rooms[1].up_col-rooms[1].bottom_col-rooms[1].width-3)+rooms[1].bottom_col+2;
-    rooms[1].y=rand()%(rooms[1].up_row-rooms[1].bottom_row-rooms[1].height-3)+rooms[1].bottom_row+2;
+    create_room(rooms[0]);
     create_room(rooms[1]);
-
-    rooms[2].bottom_col=(maxCol/3)*2,rooms[2].up_col=maxCol;
-    rooms[2].bottom_row=0,rooms[2].up_row=maxRow/2;
-    rooms[2].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[2].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[2].x=rand()%(rooms[2].up_col-rooms[2].bottom_col-rooms[2].width-3)+rooms[2].bottom_col+2;
-    rooms[2].y=rand()%(rooms[2].up_row-rooms[2].bottom_row-rooms[2].height-3)+rooms[2].bottom_row+2;
     create_room(rooms[2]);
-
-    rooms[3].bottom_col=2*(maxCol/3),rooms[3].up_col=maxCol;
-    rooms[3].bottom_row=maxRow/2,rooms[3].up_row=maxRow;
-    rooms[3].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[3].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[3].x=rand()%(rooms[3].up_col-rooms[3].bottom_col-rooms[3].width-3)+rooms[3].bottom_col+2;
-    rooms[3].y=rand()%(rooms[3].up_row-rooms[3].bottom_row-rooms[3].height-3)+rooms[3].bottom_row+2;
     create_room(rooms[3]);
-
-    rooms[4].bottom_col=maxCol/3,rooms[4].up_col=(maxCol/3)*2;
-    rooms[4].bottom_row=maxRow/2,rooms[4].up_row=maxRow;
-    rooms[4].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[4].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[4].x=rand()%(rooms[4].up_col-rooms[4].bottom_col-rooms[4].width-3)+rooms[4].bottom_col+2;
-    rooms[4].y=rand()%(rooms[4].up_row-rooms[4].bottom_row-rooms[4].height-3)+rooms[4].bottom_row+2;
     create_room(rooms[4]);
-
-    rooms[5].bottom_col=0,rooms[5].up_col=maxCol/3;
-    rooms[5].bottom_row=maxRow/2,rooms[5].up_row=maxRow;
-    rooms[5].width=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[5].height=rand()%(room_max_size-room_min_size+1)+room_min_size;
-    rooms[5].x=rand()%(rooms[5].up_col-rooms[5].bottom_col-rooms[5].width-3)+rooms[5].bottom_col+2;
-    rooms[5].y=rand()%(rooms[5].up_row-rooms[5].bottom_row-rooms[5].height-3)+rooms[5].bottom_row+2;
     create_room(rooms[5]);
 
     generate_doors(rooms);
@@ -3361,6 +3365,11 @@ void check_inDoor(int x,int y){
 
 int random_number(int min,int max){
     return (rand()%(max+1-min)+min);
+}
+
+int overlap(Room r1, Room r2) {
+    return !(r1.x + r1.width + 4 < r2.x || r2.x + r2.width + 4 < r1.x ||
+             r1.y + r1.height + 4 < r2.y || r2.y + r2.height + 4 < r1.y);
 }
 
 //second phase
