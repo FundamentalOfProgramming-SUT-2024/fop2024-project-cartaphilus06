@@ -1220,13 +1220,58 @@ int end_game(int x,int y){
 
 int game_over(){
     if(whole_map->player->hp<=0){
+        const char* skeleton[] = {
+            "     ______",
+            "  .-'      `-.",
+            " /            \\",
+            "|              |",
+            "|,  .-.  .-.  , |",
+            "| )(_o/  \\o_)( |",
+            "|/     /\\     \\|",
+            "(_     ^^     _)",
+            " \\__|IIIIII|__/",
+            " | \\IIIIII/ |",
+            "  \\          /",
+            "   `--------`",
+            NULL
+        };
+        const char* gameOver[] = {
+            "   _____          __  __ ______    ______      ________ _____  ",
+            "  / ____|   /\\   |  \\/  |  ____|  / __ \\ \\    / /  ____|  __ \\ ",
+            " | |  __   /  \\  | \\  / | |__    | |  | \\ \\  / /| |__  | |__) |",
+            " | | |_ | / /\\ \\ | |\\/| |  __|   | |  | |\\ \\/ / |  __| |  _  / ",
+            " | |__| |/ ____ \\| |  | | |____  | |__| | \\  /  | |____| | \\ \\ ",
+            "  \\_____/_/    \\_\\_|  |_|______|  \\____/   \\/   |______|_|  \\_\\",
+            "                                                               ",
+            "                                                               ",
+            NULL
+        };
+
+        int num_lines = 0;
+        while (skeleton[num_lines]) {
+            num_lines++;
+        }
         clear();
         init_pair('r',COLOR_RED,COLOR_BLACK);
         attron(COLOR_PAIR('r'));
-        int order=(maxCol-strlen("You lost!"))/2;
-        mvprintw(maxRow/2,order,"You lost!");
-        mvprintw(maxRow/2+1,order,"Press any key to return to game menu");
+        for(int i=0;i<num_lines;i++){
+            int x_order=(maxCol-strlen(skeleton[i]))/2;
+            int y_order=(maxRow-num_lines)/2+i;
+            mvprintw(y_order,x_order,"%s",skeleton[i]);
+        }
+        //mvprintw((maxRow+num_lines)/2,(maxCol-strlen("GAME OVER"))/2,"GAME OVER");
+        int lines=(maxRow+num_lines)/2;
+        num_lines = 0;
+        while (gameOver[num_lines]) {
+            num_lines++;
+        }
+        for(int i=0;i<num_lines;i++){
+            int x_order=(maxCol-strlen(gameOver[i]))/2;
+            int y_order=lines+i;
+            mvprintw(y_order,x_order,"%s",gameOver[i]);
+        }
         attroff(COLOR_PAIR('r'));
+        mvprintw(0,(maxCol-strlen("Press any key to return to game menu"))/2,"Press any key to return to game menu");
         whole_map->player->hp=16;
         whole_map->player->key=0;
         whole_map->player->broken_key=0;
@@ -2337,7 +2382,7 @@ void save(){
 
 int esc_menu(){
     char* buttons[]={"save","back to game","leader board","quit"};
-    int num_buttons=5;
+    int num_buttons=4;
     int current_selection=0;
     while(true){
         clear();

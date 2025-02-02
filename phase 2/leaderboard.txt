@@ -1,10 +1,10 @@
-mahed 0 0
-ali 0 0
-mamad 439298064 219649032
-mahdi 65528 32764
-fati 0 0
+mahed 8 4
+ali 8 4
+mamad 22 11
+mahdi 24 12
+fati 2 1
 alimorad 0 0
-mahan 54911960 -2120027668
+mahan 10 5
 jj 8190 4095
 yoru 114896 57448
 kakeru 0 0
