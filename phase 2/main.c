@@ -259,10 +259,11 @@ int main(){
     endwin();
     return 0;
 }
+
 int mPressed=0;
 int movement_measure1=10,movement_measure2=10,movement_measure3=10;
 int onShoot=false;
-
+char lastShot=0;
 void ingame_screen(){
     curs_set(FALSE);
     handle_status();
@@ -309,21 +310,28 @@ void ingame_screen(){
         if(command==' ' && (whole_map->player->current_weapon==0 || whole_map->player->current_weapon==1)){
             onShoot=false;
         }
+        if(command=='l'){
+            attack_enemy(whole_map->player->x,whole_map->player->y,lastShot);
+        }
         if(onShoot){
             if(command=='w' || command=='W'){
                 attack_enemy(whole_map->player->x,whole_map->player->y,'w');
+                lastShot='w';
                 onShoot=false;
             }
             if(command=='s' || command=='S'){
                 attack_enemy(whole_map->player->x,whole_map->player->y,'s');
+                lastShot='s';
                 onShoot=false;
             }
             if(command=='a' || command=='A'){
                 attack_enemy(whole_map->player->x,whole_map->player->y,'a');
+                lastShot='a';
                 onShoot=false;
             }
             if(command=='d' || command=='d'){
                 attack_enemy(whole_map->player->x,whole_map->player->y,'d');
+                lastShot='d';
                 onShoot=false;
             }
             quick_monster_check(whole_map->player->x,whole_map->player->y);
@@ -1378,23 +1386,19 @@ void allocate_everything(int maxRow,int maxCol){
     whole_map->player->hp=16;
     whole_map->player->food=0;
     whole_map->player->key=0;
-    whole_map->player->hunger=2;
+    whole_map->player->hunger=4;
     whole_map->player->current_weapon=0;
     whole_map->player->broken_key=0;
     whole_map->player->hp_spell_on=false,whole_map->player->damage_spell_on=false,whole_map->player->speed_spell_on=false;
     whole_map->player->hp_curse=0,whole_map->player->speed_curse=0,whole_map->player->damage_curse=0;
     rooms_f1=(Room*)malloc(sizeof(Room)*6);
     rooms_f1[4].inDoor.x=-1,rooms_f1[4].inDoor.y=-1;
-    //for(int i=0;i<6;i++) {rooms_f1[i].monster=(Monster*)malloc(sizeof(Monster)); rooms_f1[i].monster->x=-1; rooms_f1[i].monster->y=-1;}
     rooms_f2=(Room*)malloc(sizeof(Room)*6);
     rooms_f2[4].inDoor.x=-1,rooms_f2[4].inDoor.y=-1;
-    //for(int i=0;i<6;i++) {rooms_f2[i].monster=(Monster*)malloc(sizeof(Monster)); rooms_f2[i].monster->y=-1; rooms_f2[i].monster->x=-1;}
     rooms_f3=(Room*)malloc(sizeof(Room)*6);
     rooms_f3[4].inDoor.x=-1,rooms_f3[4].inDoor.y=-1;
-    //for(int i=0;i<6;i++) {rooms_f3[i].monster=(Monster*)malloc(sizeof(Monster)); rooms_f3[i].monster->x=-1; rooms_f3[i].monster->y=-1;}
     rooms_f4=(Room*)malloc(sizeof(Room)*6);
     rooms_f4[4].inDoor.x=-1,rooms_f4[4].inDoor.y=-1;
-    //for(int i=0;i<6;i++) {rooms_f4[i].monster=(Monster*)malloc(sizeof(Monster)); rooms_f4[i].monster->x=-1; rooms_f4[i].monster->y=-1;}
     traps1=(Trap*)malloc(sizeof(Trap)*6);
     traps2=(Trap*)malloc(sizeof(Trap)*6);
     traps3=(Trap*)malloc(sizeof(Trap)*6);
@@ -1430,7 +1434,6 @@ void allocate_everything(int maxRow,int maxCol){
         rooms_f4[i].curse.y=-1;
     }
     whole_map->player->sword_count=0,whole_map->player->mace_count=1,whole_map->player->dagger_count=0,whole_map->player->hammer_count=0,whole_map->player->magic_wand_count=0,whole_map->player->arrow_count=0;
-    //first row is asigned to player stats
     for(int i=0;i<maxRow;i++){
         whole_map->visibility[i]=(int*)malloc(sizeof(int)*maxCol);
         for(int j=0;j<maxCol;j++) whole_map->visibility[i][j]= i==0 ? 1 : 0;
