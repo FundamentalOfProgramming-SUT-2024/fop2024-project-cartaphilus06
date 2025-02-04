@@ -1913,9 +1913,9 @@ void move_player(int target_x,int target_y){
         if(is_room(target_x,target_y)) reveal_room(target_x,target_y);
         if(whole_map->dungeon[target_y][target_x]=='<') next_floor();
         reveal_corridor(target_x,target_y,0);
-        move_monster(lastPlayerX,lastPlayerY);
         quick_monster_check(target_x,target_y);
         monsterMoveOn();
+        move_monster(lastPlayerX,lastPlayerY);
         monster_attack();
     }
 }
@@ -3823,7 +3823,8 @@ void quick_monster_check(int x,int y){
 int checkPossibleObstaclesForMonsters(int x,int y,Room room){
     if (whole_map->dungeon[y][x]=='O' || whole_map->dungeon[y][x]=='|' || 
     whole_map->dungeon[y][x]=='_' || whole_map->dungeon[y][x]=='+' ||
-    whole_map->dungeon[y][x]=='@' || whole_map->dungeon[y][x]=='<') return 0;
+    whole_map->dungeon[y][x]=='@' || whole_map->dungeon[y][x]=='<' ||
+    whole_map->dungeon[y][x]=='&') return 0;
     for(int i=0;i<room.num_monsters;i++){
         if(x==room.monster[i].x && y==room.monster[i].y) return 0;
     }
@@ -3883,7 +3884,7 @@ void monsterMoveOn(){
     int dx[]={1,0,-1,0};
     int dy[]={0,1,0,-1};
     for(int i=0;i<4;i++){
-        if(index==0) break;
+        if(!index) break;
         if((x!=rooms[index].doors[0].x+dx[i] || y!=rooms[index].doors[0].y+dy[i]) && (x!=rooms[index].doors[1].x+dx[i] || y!=rooms[index].doors[1].y+dy[i])){
             if(i==3) return;
         }
