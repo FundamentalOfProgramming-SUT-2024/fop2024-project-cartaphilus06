@@ -3823,7 +3823,7 @@ void quick_monster_check(int x,int y){
 int checkPossibleObstaclesForMonsters(int x,int y,Room room){
     if (whole_map->dungeon[y][x]=='O' || whole_map->dungeon[y][x]=='|' || 
     whole_map->dungeon[y][x]=='_' || whole_map->dungeon[y][x]=='+' ||
-    whole_map->dungeon[y][x]=='@') return 0;
+    whole_map->dungeon[y][x]=='@' || whole_map->dungeon[y][x]=='<') return 0;
     for(int i=0;i<room.num_monsters;i++){
         if(x==room.monster[i].x && y==room.monster[i].y) return 0;
     }
