@@ -3879,7 +3879,6 @@ void monsterMoveOn(){
     int y=whole_map->player->y;
     if(whole_map->dungeon[y][x]=='#') return;
     int index=return_room_index(x,y);
-    if(!index) return;
     Room* rooms=current_floor==1?rooms_f1:current_floor==2?rooms_f2:current_floor==3?rooms_f3:rooms_f4;
     int dx[]={1,0,-1,0};
     int dy[]={0,1,0,-1};
